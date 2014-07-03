@@ -1,0 +1,92 @@
+import os
+import sys
+import pprint
+
+# Our goal here is to overload the bind() method of socket._socketobject
+# instances, so that we can insert specialized behavior in case the path
+# length of an AF_UNIX socket is too long.
+#
+# Our approach is to create a module named 'socket' -- that's this file
+# -- and position it in the PYTHONPATH environment variable so that it
+# gets loaded first any time someone imports socket.
+#
+# We then proxy through to the "real" socket module, load its symbols
+# into our own space, and act like nothing happened.
+#
+# Because this module will be masquerading as the system's socket
+# module, we want to pollute it as little as possible.  For that reason
+# all the variables we set in the global scope will begin with _x_, and
+# we'll delete them whenever possible.
+
+# First find the dir of this module, and remove it from the system
+# search path.  There's nothing else we want to load here.  Clean up
+# the variable we used to do it.  (Most likely this is sys.path[0], but
+# let's not assume.
+_x_mydir = os.path.dirname(__file__)
+if _x_mydir in sys.path:
+	sys.path.remove(_x_mydir)
+del _x_mydir
+
+
+# Try to find socket.py in the remainder of the search path, and
+# load it via execfile() since we can't specify its location using
+# standard import tools.  (Any anyway, most of the import stuff caches
+# aggressively and is hard to use in this sneaky pattern.)
+#
+# Again, use _x_ variables to avoid collisions, and clean them up.
+for _x_dir in sys.path:
+	_x_test = os.path.join(_x_dir, 'socket.py')
+	if os.path.exists(_x_test):
+		execfile(_x_test)
+		break
+del _x_dir
+del _x_test
+
+# This function can be used to bind a method into an existing class.  It
+# can use any variable names in its local scope.
+def _x_bindmethod(f, cls, name=None):
+	if not name:
+		name = f.__name__
+	setattr(cls, name, f)
+
+# Pick out our target class - the type that a socket is of - and take
+# a reference to the real bind() method.
+_x_realbind = _socketobject.bind
+
+
+# Create a wrapper for realbind...
+def _x_mybind(self, addr):
+	# debug - remove
+#	print 'dbg> MYBIND', self
+
+	# If we're dealing with an AF_UNIX socket, split the address (path)
+	# and chdir to the directory before binding to the path-relative
+	# "file".
+	if hasattr(addr, 'rsplit'):
+		# (has rsplit -> is a string -> af_unix)
+		dir, file = addr.rsplit(os.path.sep, 1)
+
+		# debug - remove
+#		print "dbg> bind() path is %d bytes long" % len(addr)
+#		print "dbg> chdir(%s)" % dir
+#		print "dbg> bind(%s)" % file
+
+		# save an fd on our current directory and chdir
+		cwdfd = os.open('.', os.O_RDONLY)
+		os.chdir(dir)
+
+		# proxy through to realbind
+		_x_realbind(self, file)
+
+		# use the saved fd to fchdir() back
+		os.fchdir(cwdfd)
+
+	# Otherwise pop through to realbind.
+	else:
+		_x_realbind(self, addr)
+
+# Bind the "bind" method name to our proxy bind.
+setattr(_socketobject, 'bind', _x_mybind)
+
+# Clean up
+del _x_mybind

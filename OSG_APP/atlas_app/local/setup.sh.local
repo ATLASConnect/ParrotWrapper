@@ -1,0 +1,7 @@
+#!/bin/sh
+
+
+#[ -f /osg/mwt2/app/atlas_app/local/LocalFrontier.sh ] && source /osg/mwt2/app/atlas_app/local/LocalFrontier.sh
+
+#[ -f /share/local/setup.sh.local ] && source /share/local/setup.sh.local
+
