@@ -17,7 +17,7 @@ pcvmfsVer="2.1.19"
 [[ ! -z $1 ]] && pcvmfsVer=$2
 
 # Where we can find the pCVMFS tarball
-pcvmfsHome=/home/src/pcvmfs
+pcvmfsHome=/home/www/parrot
 
 
 
