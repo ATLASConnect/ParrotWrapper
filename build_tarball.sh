@@ -1,13 +1,14 @@
 #!/bin/sh
 
 # The CCTOOLS we are to use
+#cctoolsVer="current"
 cctoolsVer="4.2.0rc2"
 
 # Override the default it given
 [[ ! -z $1 ]] && cctoolsVer=$1
 
 # Were we can find the cctools tarball
-cctoolsHome=/home/src/cctools
+cctoolsHome=/home/www/parrot
 
 
 # The pCVMFS we are to use
@@ -61,8 +62,8 @@ function f_maketarball () {
   cp -r ${tmpHome}/cctools/lib/lib              ${parrotHome}
   cp -r ${tmpHome}/cctools/lib/lib64            ${parrotHome}
 
-  # Untar the pCVMFS into the Parrot Home
-  tar --extract --gzip --directory=${parrotHome} --file=${pcvmfsHome}/pcvmfs-${pcvmfsVer}.tar.gz
+  # Untar the PortableCVMFS into the parrot Home area
+  tar --extract --gzip --directory=${parrotHome} --file=${pcvmfsHome}/PortableCVMFS-${pcvmfsVer}.tar.gz
 
   # Copy over the $OSG_APP area
   cp -r ${buildHome}/OSG_APP                    ${parrotHome}/OSG_APP
@@ -71,6 +72,7 @@ function f_maketarball () {
   cp ${buildHome}/functions.sh                  ${parrotHome}/functions.sh;      chmod 755 ${parrotHome}/functions.sh
   cp ${buildHome}/parrot_wrapper.sh             ${parrotHome}/parrot_wrapper.sh; chmod 755 ${parrotHome}/parrot_wrapper.sh
   cp ${buildHome}/setup_ace.sh                  ${parrotHome}/setup_ace.sh;      chmod 755 ${parrotHome}/setup_ace.sh
+  cp ${buildHome}/setup_osg.sh                  ${parrotHome}/setup_osg.sh;      chmod 755 ${parrotHome}/setup_osg.sh
   cp ${buildHome}/setup_ca.sh                   ${parrotHome}/setup_ca.sh;       chmod 755 ${parrotHome}/setup_ca.sh
   cp ${buildHome}/setup_site.sh.$factoryName    ${parrotHome}/setup_site.sh;     chmod 755 ${parrotHome}/setup_site.sh
   cp ${buildHome}/exec.sh                       ${parrotHome}/exec.sh;           chmod 755 ${parrotHome}/exec.sh
@@ -99,15 +101,15 @@ buildHome="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Make all the tarballs
 
 f_maketarball generic        ${cctoolsVer}
-#f_maketarball icc            ${cctoolsVer}
-#f_maketarball icc_golub      ${cctoolsVer}
-#f_maketarball icc_hept3      ${cctoolsVer}
-#f_maketarball icc_mcore      ${cctoolsVer}
-#f_maketarball icc_taub       ${cctoolsVer}
-#f_maketarball midway         ${cctoolsVer}
-#f_maketarball midway_mcore   ${cctoolsVer}
-#f_maketarball odyssey        ${cctoolsVer}
-#f_maketarball stampede       ${cctoolsVer}
-#f_maketarball stampede_mcore ${cctoolsVer} 
-#f_maketarball uci            ${cctoolsVer}
-#f_maketarball utexas         ${cctoolsVer}
+f_maketarball icc            ${cctoolsVer}
+f_maketarball icc_golub      ${cctoolsVer}
+f_maketarball icc_hept3      ${cctoolsVer}
+f_maketarball icc_mcore      ${cctoolsVer}
+f_maketarball icc_taub       ${cctoolsVer}
+f_maketarball midway         ${cctoolsVer}
+f_maketarball midway_mcore   ${cctoolsVer}
+f_maketarball odyssey        ${cctoolsVer}
+f_maketarball stampede       ${cctoolsVer}
+f_maketarball stampede_mcore ${cctoolsVer} 
+f_maketarball uci            ${cctoolsVer}
+f_maketarball utexas         ${cctoolsVer}

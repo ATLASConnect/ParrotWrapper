@@ -41,8 +41,8 @@ function f_ulimit () {
 
   # If the given value is still blank, then do not set the ulimit
   if [[ ! -z ${_ulimitVAL} ]]; then
-    ulimit -S ${_ulimitOPT} ${_ulimitVAL}
-    [[ $? -ne 0 ]] && f_echo "Unable to set ulimit ${_ulimitOPT} to ${_ulimitVAL}"
+    ulimit -S ${_ulimitOPT} ${_ulimitVAL} 2>/dev/null
+    [[ $? -ne 0 ]] && f_echo "Unable to set ulimit ${_ulimitOPT} to ${_ulimitVAL}: Value is $(ulimit ${_ulimitOPT})"
   fi
 
 }
@@ -50,15 +50,40 @@ function f_ulimit () {
 
 # Add a path to $PATH if it is missing
 
-f_addpath () {
+function f_addpath () {
 
-  echo $PATH | /bin/egrep -q "(^|:)$1($|:)"
+  echo ${PATH} | /bin/egrep -q "(^|:)$1($|:)"
 
   if [[ $? -ne 0 ]]; then
-    if [[ -z $PATH ]]; then
+    if [[ -z "${PATH}" ]]; then
       export PATH=$1
     else
-      export PATH=$PATH:$1
+      if [[ $2 == "^" ]]; then
+        export PATH=$1:${PATH}
+      else
+        export PATH=${PATH}:$1
+      fi
+    fi
+  fi
+
+}
+
+
+# Add a path to $LD_LIBRARY_PATH if it is missing
+
+function f_addldlibrarypath () {
+
+  echo ${LD_LIBRARY_PATH} | /bin/egrep -q "(^|:)$1($|:)"
+
+  if [[ $? -ne 0 ]]; then
+    if [[ -z "${LD_LIBRARY_PATH}" ]]; then
+      export LD_LIBRARY_PATH=$1
+    else
+      if [[ $2 == "^" ]]; then
+        export LD_LIBRARY_PATH=$1:${LD_LIBRARY_PATH}
+      else
+        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$1
+      fi
     fi
   fi
 

@@ -35,7 +35,7 @@ aceRsync="/usr/bin/rsync --quiet --delete --ignore-errors --archive --no-owner -
 
 # Only install a Certificate Authority into the ACE Cache if we are not using a CVMFS copy
 
-if [[ -n ${parrotUseCVMFSaceCA} ]]; then
+if [[ -z ${parrotUseCVMFSaceCAtb} ]]; then
   f_echo "Using CVMFS based ACE Certicate Authority from ${aceCA}"
 else
 

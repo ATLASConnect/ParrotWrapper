@@ -1,23 +1,40 @@
 #!/bin/bash
 
 ######################################################################################
-# Native CVMFS, nfsCVMFS, Portable CVMFS, Parrot/CVMFS or Parrot/Chirp Wrapper
-######################################################################################
 
-# cvmfsType values
- 
-# native	CVMFS installed on the node                              No ACE Cache
-# parrot	CVMFS will be accessed via Parrot/CVMFS or Parrot/Chirp  Use ACE Cache
-# nfs		CVMFS is installed locally via NFS                       Use ACE Cache
-# portable	CVMFS will be accessed via pCVMFS                        Use ACE Cache
-
-######################################################################################
 
 # The version of the wrapper
-export parrotWrapperVersion="1.6-0"
+export parrotWrapperVersion="2.0-3"
+
 
 ######################################################################################
-
+# Native CVMFS, nfsCVMFS, PortableCVMFS, Parrot/CVMFS or Parrot/Chirp Wrapper
+######################################################################################
+# 
+#
+# The following variables will modify the action taken by the Parrot Wrapper
+# 
+# These should be set in the setup_site.sh script based on the requirements of the site
+#
+# At the minimum, $cvmfsType should be defined to one of the following values
+#
+# 	native		Use System installed CVMFS,    HEPOS_libs and Certificate Authority
+#	parrot		Use Parrot to access CVMFS,    ACE Cache available
+#	nfs		Use System installed nfsCVMFS, ACE Cache available
+#	portable	Use PortableCVMFS,             ACE Cache available
+#
+# Default value for $cvmfsType is "native"
+#
+#
+# The ACE Cache contains and ACE Image (for HEPOS_lib), OSG WN Client and a Certicate Authority
+# The ACE Cache componitents can be local (default tarball installation) or a CVMFS repository
+# The ACE Image can be bypassed and the System libraries used
+#
+# If Parrot/CVMFS is used, Parrot can "mount" access into the ACE Image
+#
+#
+######################################################################################
+#
 # If parrotUseNativeONLY is defined, use Native access for all components
 #
 # These include
@@ -27,13 +44,20 @@ export parrotWrapperVersion="1.6-0"
 #	$OSG_APP	Defined by the system or within setup_site.sh
 #	$OSG_GRID	Defined by the system or within setup_site.sh
 #	$OSG_WN_TMP	Setup by this wrapper within the job sandbox
-#	$HTTP_CERT_DIR	Defined by the system or within setup_site.sh or a CA at /etc/grid-security/certificates
+#	$X509_CERT_DIR	Defined by the system or within setup_site.sh or a CA at /etc/grid-security/certificates
 #
 #export parrotUseNativeONLY=True
 
 
+# If parrotUsePortableCVMFS is defined, use PortableCVMFS to access all /cvmfs repositories
+# By default, it is assume that /cvmfs is mounted locally
+# The wrapper will setup access to an ACE Image (via env var), OSG WN Client and Certficate Authority
+#export parrotUsePortableCVMFS=True
+
+
 # If parrotUseParrotCVMFS is defined, use Parrot to access all /cvmfs repositories
 # By default, it is assume that /cvmfs is mounted locally
+# The wrapper will setup access to an ACE Image (via parrot mounts), OSG WN Client and Certficate Authority
 #export parrotUseParrotCVMFS=True
 
 
@@ -43,19 +67,29 @@ export parrotWrapperVersion="1.6-0"
 #export parrotUseParrotChirp=True
 
 
-# If parrotUseCVMFSaceImage is defined, we will use an ACE Image directly from CVMFS
-# By default, an ACE Image tarball will be downloaded into the ACE Cache
-#export parrotUseCVMFSaceImage=True
+# If parrotUseParrotMount is defined (and useing Parrot for CVMFS access), use Parrot --mount to access ACE Image
+# By default, ACE Image access will be via environment variables (same as other CVMFS access types)
+#export parrotUseParrotMount=True
 
 
-# If parrotUseCVMFSaceWNC is defined, we will use the OSG WN Client directly from CVMFS
-# By default, the OSG WNC Client tarball will be downloaded into the ACE Cache
-#export parrotUseCVMFSaceWNC=True
+# If parrotUseCVMFSaceImageTB is defined, we will use an ACE Image from a Tarball installed in the ACE Cache
+# By default, an ACE Image from a CVMFS repository will be used
+#export parrotUseCVMFSaceImageTB=True
 
 
-# If parrotUseCVMFSaceCA is defined, we will use a Certificate Authority directly from CVMFS
-# By default, a Certificate Authority will be rsync from the CVMFS repository
-#export parrotUseCVMFSaceCA=True
+# If parrotUseCVMFSaceWNCtb is defined, we will use the OSG WN Client from a Tarball installed in the ACE Cache
+# By default, the OSG WNC Client from a CVMFS repository will be used
+#export parrotUseCVMFSaceWNCtb=True
+
+
+# If parrotUseCVMFSaceCAtb is defined, we will use a Certificate Authority from an installation in the ACE Cache
+# By default, a Certificate Authority from a CVMFS repoisitory will be used
+#export parrotUseCVMFSaceCAtb=True
+
+
+# If parrotUseSystemLIB is defined, we will use an local System libraries for HEPOS_libs, etc
+# By default, LD_LIBRARY_PATH, etc will be modified to use the ACE Image libraries
+#export parrotUseSystemLIB=True
 
 
 # If parrotUseThreadCloneFix is defined, we will use the Parrot Thread Clone Bugfix
@@ -70,30 +104,27 @@ export parrotWrapperVersion="1.6-0"
 #export parrotUseCachePerJob=True
 
 
-######################################################################################
-# Default values for some external parameters we need to know
-# We can override these defaults in setup_site.sh
-######################################################################################
-
 # The Chirp Server upon which the CVMFS repositories are statically mounted and accessible
 #export parrotChirpServer="uct2-c320.mwt2.org"
-export parrotChirpServer="uct2-int.mwt2.org"
+#export parrotChirpServer="uct2-int.mwt2.org"
+
 
 # The blocksize to use for Parrot/Chirp, 1M or 2M
 #export parrotChirpBlocksize=1048576
-export parrotChirpBlocksize=2097152
+#export parrotChirpBlocksize=2097152
 
 
-
-# Location of the ACE Image if parrotUseCVMFSaceImage is defined
-export parrotCVMFSaceImage=/cvmfs/osg.mwt2.org/atlas/sw/ACE/current
+# Location of the ACE Image if parrotUseCVMFSaceImageTB is not defined
+#export parrotCVMFSaceImage=/cvmfs/osg.mwt2.org/atlas/sw/ACE/current
 #export parrotCVMFSaceImage=/cvmfs/cernvm-prod.cern.ch/cvm3
 
-# Location of the OSG WN Client if parrotUseCVMFSaceWNC is defined
-export parrotCVMFSaceWNC=/cvmfs/osg.mwt2.org/osg/sw
 
-# Location of the Certificate Authority repository 
-export parrotCVMFSaceCA=/cvmfs/osg.mwt2.org/osg/CA
+# Location of the OSG WN Client if parrotUseCVMFSaceWNCtb is not defined
+#export parrotCVMFSaceWNC=/cvmfs/osg.mwt2.org/osg/sw
+
+
+# Location of the Certificate Authority repository if parrotUseCVMFSaceCAtb is not defined
+#export parrotCVMFSaceCA=/cvmfs/osg.mwt2.org/osg/CA
 
 
 ######################################################################################
@@ -126,18 +157,92 @@ source ${parrotHome}/setup_site.sh
 
 
 #########################################################################################
-# If we are full Native, force a few definitions
+# Based on CVMFS Access Type, etc, make certain definitions make sense
 #########################################################################################
 
-# If Native Only, make certain we are configured properly
-# We will still setup a Parrot and ACE Cache definitions for cleanup and scratch space
+# If we have not defined a CVMFS access type, use undefined
+[[ -z "${cvmfsType}" ]] && export cvmfsType="undefined"
 
-if [[ -n "${parrotUseNativeONLY}" ]]; then
 
-  # Use Native CVMFS only
-  export parrotUseParrotCVMFS
+# Set value values based on the CVMFS Access Type
 
-fi
+case ${cvmfsType} in
+
+  # Use Parrot to access /cvmfs
+
+  (parrot)
+
+    export parrotUseNativeONLY=''
+    export parrotUseParrotCVMFS=True
+    export parrotUseNfsCVMFS=''
+    export parrotUsePortableCVMFS=''
+
+  ;;
+
+
+  # Use nfsCVMFS to access /cvmfs
+
+  (nfs)
+
+    export parrotUseNativeONLY=''
+    export parrotUseParrotCVMFS=''
+    export parrotUseNfsCVMFS=True
+    export parrotUsePortableCVMFS=''
+
+  ;;
+
+
+  # Use PorableCVMFS to access /cvmfs
+
+  (portable)
+
+    export parrotUseNativeONLY=''
+    export parrotUseParrotCVMFS=''
+    export parrotUseNfsCVMFS=''
+    export parrotUsePortableCVMFS=True
+
+  ;;
+
+
+  # By default, CVMFS access will be Native
+
+  (*)
+
+    export parrotUseNativeONLY=True
+    export parrotUseParrotCVMFS=''
+    export parrotUsePortableCVMFS=''
+    export parrotUseNfsCVMFS=''
+    export parrotUseSystemLIB=True
+
+  ;;
+
+
+esac
+
+
+# If we are using tye System libraries (not the ACE Image), undefine UseParrotMount
+[[ -n "${parrotUseSystemLIB}" ]] && export parrotUseParrotMount=''
+
+
+# The Chirp Server upon which the CVMFS repositories are statically mounted and accessible
+[[ -z "${parrotChirpServer}" ]] && export parrotChirpServer="uct2-int.mwt2.org"
+#[[ -z "${parrotChirpServer}" ]] && export parrotChirpServer="uct2-c320.mwt2.org"
+
+# The blocksize to use for Parrot/Chirp, 1M or 2M
+[[ -z "${parrotChirpBlocksize}" ]] && export parrotChirpBlocksize=2097152
+#[[ -z "${parrotChirpBlocksize}" ]] && export parrotChirpBlocksize=1048576
+
+
+
+# Location of the ACE Image if parrotUseCVMFSaceImageTB is not defined
+[[ -z "${parrotCVMFSaceImage}" ]] && export parrotCVMFSaceImage=/cvmfs/osg.mwt2.org/atlas/sw/ACE/current
+#[[ -z "${parrotCVMFSaceImage}" ]] && export parrotCVMFSaceImage=/cvmfs/cernvm-prod.cern.ch/cvm3
+
+# Location of the OSG WN Client if parrotUseCVMFSaceWNCtb is not defined
+[[ -z "${parrotCVMFSaceWNC}" ]] && export parrotCVMFSaceWNC=/cvmfs/osg.mwt2.org/osg/sw
+
+# Location of the Certificate Authority if parrotUseCVMFSaceCAtb is not defined
+[[ -z "${parrotCVMFSaceCA}" ]] && export parrotCVMFSaceCA=/cvmfs/osg.mwt2.org/osg/CA
 
 
 #########################################################################################
@@ -283,28 +388,28 @@ export aceCache=${aceCacheDailyRoot}
 
 # Location of the CA
 
-if [[ -n "${parrotUseCVMFSaceCA}" ]]; then
-  export aceCA=${parrotCVMFSaceCA}
-else
+if [[ -n "${parrotUseCVMFSaceCAtb}" ]]; then
   export aceCA=${aceCache}/CA
+else
+  export aceCA=${parrotCVMFSaceCA}
 fi
 
 
 # Location of the ACE OSG WN Client
 
-if [[ -n "${parrotUseCVMFSaceWNC}" ]]; then
-  export aceWNC=${parrotCVMFSaceWNC}
-else
+if [[ -n "${parrotUseCVMFSaceWNCtb}" ]]; then
   export aceWNC=${aceCache}/osg
+else
+  export aceWNC=${parrotCVMFSaceWNC}
 fi
 
 
 # Location of the ACE Image (CVMFS or the ACE Cache)
 
-if [[ -n "${parrotUseCVMFSaceImage}" ]]; then
-  export aceImage=${parrotCVMFSaceImage}
-else
+if [[ -n "${parrotUseCVMFSaceImageTB}" ]]; then
   export aceImage=${aceCache}/ACE
+else
+  export aceImage=${parrotCVMFSaceImage}
 fi
 
 
@@ -324,29 +429,44 @@ echo "##########################################################################
 # Display the Parrot Wrapper to help us debug
 f_echo "Parrot Wrapper Version ${parrotWrapperVersion}"
 
-if [[ -n "${parrotUseNativeONLY}" ]]; then
-  f_echo "Native access to all CVMFS repositories"
-elif [[ -z "${parrotUseParrotCVMFS}" ]]; then
-  f_echo "Native access to all CVMFS repositories"
-else
+f_echo "CVMFS Access Type         = ${cvmfsType}"
 
-  if [[ -z "${parrotUseParrotChirp}" ]]; then
-    f_echo "Parrot/CVMFS   Version ${parrotVersion}" 
-  else
-    f_echo "Parrot/Chirp   Version ${parrotVersion}"
+if [[ -n "${parrotUseNativeONLY}" ]]; then
+  f_echo "CVMFS Repository Access   = Native CVMFS"
+elif [[ -n "${parrotUseNfsCVMFS}" ]]; then
+  f_echo "CVMFS Repository Access   = nfsCVMFS"
+elif [[ -n "${parrotUsePortableCVMFS}" ]]; then
+  f_echo "CVMFS Repository Access   = PortableCVMFS"
+elif [[ -n "${parrotUseParrotCVMFS}" ]]; then
+
+  if [[ -n "${parrotUseParrotChirp}" ]]; then
+    f_echo "CVMFS Repository Access   = Parrot/Chirp Version ${parrotVersion}"
     f_echo "Chirp Server              = ${parrotChirpServer}"
     f_echo "Chirp Server Blocksize    = ${parrotChirpBlocksize}"
     f_echo "ParrotRunChirp            = ${parrotRunChirp}"
+  else
+    f_echo "CVMFS Repository Access   = Parrot/CVMFS Version ${parrotVersion}"
+  fi
+
+  if [[ -n "${parrotUseParrotMount}" ]]; then
+    f_echo "Parrot Mount              = Enabled"
+  else
+    f_echo "Parrot Mount              = Disabled"
   fi
 
   f_echo "ParrotRunCVMFS            = ${parrotRunCVMFS}"
 
+else
+  f_echo "CVMFS Repository Access   = *Unknown*"
 fi
 
 
 f_echo "Kernel                    = $(uname --kernel-release)"
 
-if [[ -z "${parrotUseNativeONLY}" ]]; then
+if [[ -n "${parrotUseNativeONLY}" ]]; then
+  f_echo "ACE Cache                 = Disabled"
+else
+  f_echo "ACE Cache                 = Enabled"
   f_echo "ACE Certificate Authority = ${aceCA}/certificates"
   f_echo "ACE Worker Node Client    = ${aceWNC}/osg-wn-client"
   f_echo "ACE Image                 = ${aceImage}"
@@ -355,6 +475,12 @@ if [[ -z "${parrotUseNativeONLY}" ]]; then
   if [[ -n "${parrotUseParrotCVMFS}" ]]; then
     f_echo "ACE etc                   = ${aceEtc}"
     f_echo "ACE var                   = ${aceVar}"
+  fi
+
+  if [[ -n "${parrotUseSystemLIB}" ]]; then
+    f_echo "ACE Image Libraries       = Disabled"
+  else
+    f_echo "ACE Image Libraries       = Enabled"
   fi
 fi
 
@@ -391,12 +517,13 @@ f_addpath "/sbin"
 f_ulimit -t unlimited ${ulimitCPU}
 f_ulimit -d unlimited ${ulimitDataSeg}
 f_ulimit -f unlimited ${ulimitFileSize}
-f_ulimit -n 4096      ${ulimitOpenFiles}
+f_ulimit -n unlimited ${ulimitOpenFiles}
 f_ulimit -s unlimited ${ulimitStackSize}
 f_ulimit -m unlimited ${ulimitMaxMem}
 f_ulimit -v unlimited ${ulimitVirMem}
 f_ulimit -x unlimited ${ulimitFileLocks}
 
+#f_ulimit -n 4096      ${ulimitOpenFiles}
 #f_ulimit -c ''        ${ulimitCoreFileSize}
 #f_ulimit -e ''        ${ulimitSchedPrio}
 #f_ulimit -i ''        ${ulimitPendSig}
@@ -405,6 +532,7 @@ f_ulimit -x unlimited ${ulimitFileLocks}
 #f_ulimit -q ''        ${ulimitPOSIXMesQ}
 #f_ulimit -r ''        ${ulimitRTPrio}
 
+f_echo
 f_echo "Executing command: ulimit -a"
 f_echo
 
@@ -478,12 +606,12 @@ fi
 
 
 #########################################################################################
-# Setup the ACE Cache
+# Setup the ACE Image
 #########################################################################################
 
-# Setup the Atlas Compliant Environment (ACE) unless we are Native Only
+# Setup the Atlas Compliant Environment (ACE) Image unless we are to use the System libraries
 
-if [[ -z "${parrotUseNativeONLY}" ]]; then
+if [[ -z "${parrotUseSystemLIB}" ]]; then
 
   source ${parrotHome}/setup_ace.sh
 
@@ -492,9 +620,32 @@ if [[ -z "${parrotUseNativeONLY}" ]]; then
 
   if [[ ${aceStatus} -ne 0 ]]; then
      f_echo
-     f_echo "Aborting job: Unable to setup the Atlas Compliant Environment with error ${aceStatus}"
+     f_echo "Aborting job: Unable to setup the ACE Image with error ${aceStatus}"
      f_echo
      exit ${aceStatus}
+  fi
+
+fi
+
+
+#########################################################################################
+# Setup the ACE OSG WN Client
+#########################################################################################
+
+# Setup OSG WN Client, useless we are using NativeONLY
+
+if [[ -z "${parrotUseNativeONLY}" ]]; then
+
+  source ${parrotHome}/setup_osg.sh
+
+  # Save the ACE installation status
+  osgStatus=$?
+
+  if [[ ${osgStatus} -ne 0 ]]; then
+     f_echo
+     f_echo "Aborting job: Unable to setup the ACE OSG WN Client with error ${osgStatus}"
+     f_echo
+     exit ${osgStatus}
   fi
 
 fi
@@ -531,26 +682,28 @@ fi
 
 
 # Use a local $OSG_APP as defined by the system or setup_site.sh
-# Otherwise use the OSG_APP included with the tarball
+# Otherwise use the $OSG_APP included with the ParrotWrapper
 
-if [[ -z "${parrotUseNativeONLY}" ]]; then
+if [[ -n "${parrotUseNativeONLY}" ]]; then
 
-  # We will use a $OSG_APP packaged with Parrot Wrapper
-  export OSG_APP=${parrotHome}/OSG_APP
+  # If the system has not defined a $OSG_APP, use the one in the ParrotWrapper
 
-  # The local additions invoked when setting up Atlas jobs
-  export ATLAS_LOCAL_AREA=${OSG_APP}/atlas_app/local
-
-  f_echo "\$OSG_APP                  = ${OSG_APP}"
-  f_echo "\$ATLAS_LOCAL_AREA         = ${ATLAS_LOCAL_AREA}"
+  if [[ -z "${OSG_APP}" ]]; then
+    export OSG_APP=${parrotHome}/OSG_APP
+    export ATLAS_LOCAL_AREA=${OSG_APP}/atlas_app/local
+  fi
 
 else
 
-  f_echo "\$OSG_APP                  = ${OSG_APP}"
-  f_echo "\$ATLAS_LOCAL_AREA         = *SYSTEM*"
+  # For most CVMFS Access Types, always use a $OSG_APP packaged with ParrotWrapper
+
+  export OSG_APP=${parrotHome}/OSG_APP
+  export ATLAS_LOCAL_AREA=${OSG_APP}/atlas_app/local
 
 fi
 
+f_echo "\$OSG_APP                  = ${OSG_APP}"
+f_echo "\$ATLAS_LOCAL_AREA         = ${ATLAS_LOCAL_AREA}"
 
 
 # Use a local $OSG_GRID (OSG WN Client) as defined by the system or setup_site.sh
@@ -560,15 +713,19 @@ if [[ -z "${parrotUseNativeONLY}" ]]; then
   export OSG_GRID=${aceWNC}/osg-wn-client
 fi
 
-f_echo "\$OSG_GRID                 = ${OSG_GRID}"
+if [[ -n "${OSG_GRID}" ]]; then
+  f_echo "\$OSG_GRID                 = ${OSG_GRID}"
+else
+  f_echo "\$OSG_GRID                 = *SYSTEM*"
+fi
 
 
 # Use the specified worker node temp area
 
-if [[ -z ${_condor_LOCAL_DIR} ]]; then
-  export OSG_WN_TMP=${aceCache}/scratch
-else
+if [[ -n ${_condor_LOCAL_DIR} ]]; then
   export OSG_WN_TMP=${_condor_LOCAL_DIR}/scratch
+else
+  export OSG_WN_TMP=${aceCache}/scratch
 fi
 
 # Make certain the OSG WN scratch exists
@@ -579,22 +736,22 @@ f_echo "\$OSG_WN_TMP               = ${OSG_WN_TMP}"
 
 # Define a proxy to use
 
-if [[ -z "${parrotUseNativeONLY}" ]]; then
+if [[ -n "${parrotUseNativeONLY}" ]]; then
+  f_echo "\$HTTP_PROXY               = *SYSTEM*"
+else
   export HTTP_PROXY=${parrotProxy}
   f_echo "\$HTTP_PROXY               = ${HTTP_PROXY}"
-else
-  f_echo "\$HTTP_PROXY               = *SYSTEM*"
 fi
 
 
 
 # Default Certificate Authority (osg-wn-client may override this value)
 
-if [[ -z "${parrotUseNativeONLY}" ]]; then
+if [[ -n "${parrotUseNativeONLY}" ]]; then
+  f_echo "\$X509_CERT_DIR            = *SYSTEM*"
+else
   export X509_CERT_DIR=${aceCA}/certificates
   f_echo "\$X509_CERT_DIR            = ${X509_CERT_DIR}"
-else
-  f_echo "\$X509_CERT_DIR            = *SYSTEM*"
 fi
 
 
@@ -649,12 +806,19 @@ OLD_TMPDIR=${TMPDIR} ; export TMPDIR=${parrotCacheTMP}/TMPDIR ; ln -s ${OLD_TMPD
 # And finally, are we Native or Run Parrot Run
 #########################################################################################
 
+f_echo
 
-# Should we use Native or Parrot access of CVMFS repositories
+# Should we use Parrot or another way to access the CVMFS repositories
 
 if [[ -z "${parrotUseParrotCVMFS}" ]]; then
 
-  f_echo "Begin execution using Native CVMFS to access the repositories"
+  if [[ -n "${parrotUseNativeONLY}" ]]; then
+    f_echo "Begin execution using Native CVMFS to access the repositories"
+  elif [[ -n "${parrotUseNfsCVMFS}" ]]; then
+    f_echo "Begin execution using nfsCVMFS to access the repositories"
+  elif [[ -n "${parrotUsePortableCVMFS}" ]]; then
+    f_echo "Begin execution using PortableCVMFS to access the repositories"
+  fi
 
   echo "################################################################################"
   echo
@@ -666,8 +830,6 @@ if [[ -z "${parrotUseParrotCVMFS}" ]]; then
 
 else
 
-  # We redirect via --mount all bin, library, python and perl modules to the ACE Image
-
   if [[ -n "${parrotUseParrotChirp}" ]]; then
     f_echo "Begin execution within Parrot/Chirp ${parrotVersion} environment"
   else
@@ -677,8 +839,13 @@ else
   echo "################################################################################"
   echo
 
-  # Execute the command in a parrot-enabled bash subshell 
-  ${parrotBIN}/parrot_run								\
+
+  # We redirect via --mount all bin, library, python and perl modules to the ACE Image
+
+  if [[ -n "${parrotUseParrotMount}" ]]; then
+
+    # Execute the command in a parrot-enabled bash subshell, mapping access into the ACE Image
+    ${parrotBIN}/parrot_run								\
 	--with-snapshots 								\
 	--timeout 900									\
 	--tempdir "${parrotCache}"							\
@@ -704,9 +871,27 @@ else
         ${parrotRunChirp}								\
 		${parrotHome}/exec.sh "$@"
 
-  # Save the return code from the user job
-  wrapperRet=$?
+    # Save the return code from the user job
+    wrapperRet=$?
 
+  else
+
+    # Execute the command in a parrot-enabled bash subshell 
+    ${parrotBIN}/parrot_run								\
+	--with-snapshots 								\
+	--timeout 900									\
+	--tempdir "${parrotCache}"							\
+	--proxy   "${parrotProxy}"							\
+	--cvmfs-repo-switching 								\
+	--cvmfs-repos "<default-repositories> ${cvmfsRepoList}"				\
+        ${parrotRunCVMFS}								\
+        ${parrotRunChirp}								\
+		${parrotHome}/exec.sh "$@"
+
+    # Save the return code from the user job
+    wrapperRet=$?
+
+  fi
 fi
 
 #########################################################################################
