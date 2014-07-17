@@ -6,6 +6,8 @@
 
 
 # Frontier Server
+#export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://uct2-grid1.mwt2.org:3128)"
+
 export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://uct2-grid1.mwt2.org:3128)(proxyurl=http://mwt2-squid.campuscluster.illinois.edu:3128)"
 
 #export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://uct2-grid1.mwt2.org:3128)(proxyurl=http://iut2-squid.iu.edu:3128)(proxyurl=http://mwt2-squid.campuscluster.illinois.edu:3128)"

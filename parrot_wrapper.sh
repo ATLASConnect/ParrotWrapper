@@ -4,7 +4,7 @@
 
 
 # The version of the wrapper
-export parrotWrapperVersion="2.0-3"
+export parrotWrapperVersion="2.0-5"
 
 
 ######################################################################################
@@ -512,13 +512,19 @@ f_addpath "/sbin"
 # Setup the ulimits for this job
 #########################################################################################
 
+# Fill in some defaults we would like to use
+
+[[ -z "${_ulimitOpenSize}  ]] && _ulimitOpenSize=65536
+[[ -z "${_ulimitStackSize} ]] && _ulimitStackSize=unlimited
+
+
 # Set the various ulimits for the job using any values set in setup_site.sh
 
 f_ulimit -t unlimited ${ulimitCPU}
 f_ulimit -d unlimited ${ulimitDataSeg}
 f_ulimit -f unlimited ${ulimitFileSize}
-f_ulimit -n unlimited ${ulimitOpenFiles}
-f_ulimit -s unlimited ${ulimitStackSize}
+f_ulimit -n      4096 ${ulimitOpenFiles}
+f_ulimit -s     10240 ${ulimitStackSize}
 f_ulimit -m unlimited ${ulimitMaxMem}
 f_ulimit -v unlimited ${ulimitVirMem}
 f_ulimit -x unlimited ${ulimitFileLocks}

@@ -6,7 +6,9 @@
 
 
 # Frontier Server
-export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://net2.rc.fas.harvard.edu:3128)(proxyurl=http://atlas-net2.bu.edu:3128)"
+export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://net2.rc.fas.harvard.edu:3128)"
+
+#export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://net2.rc.fas.harvard.edu:3128)(proxyurl=http://atlas-net2.bu.edu:3128)"
 
 #export FRONTIER_SERVER="(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://frontier.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://frontier01.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://frontier02.racf.bnl.gov:8000/frontieratbnl)(serverurl=http://lcgft-atlas.gridpp.rl.ac.uk:3128/frontierATLAS)(serverurl=http://lcgvo-frontier01.gridpp.rl.ac.uk:3128/frontierATLAS)(serverurl=http://lcgvo-frontier02.gridpp.rl.ac.uk:3128/frontierATLAS)(proxyurl=http://net2.rc.fas.harvard.edu:3128)(proxyurl=http://atlas-net2.bu.edu:3128)"
 

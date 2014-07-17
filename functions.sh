@@ -25,6 +25,8 @@ function f_echo () {
 
   echo "${_date}| ${_name} | $@"
 
+  return 0
+
 }
 
 
@@ -36,14 +38,32 @@ function f_ulimit () {
   _ulimitDEF=$2
   _ulimitVAL=$3
 
-  # If the given value is blank, use the default
-  [[ -z ${_ulimitVAL} ]] && _ulimitVAL=${_ulimitDEF}
+  # If we have a preferred value, try to set it
 
-  # If the given value is still blank, then do not set the ulimit
-  if [[ ! -z ${_ulimitVAL} ]]; then
+  if [[ -n "${_ulimitVAL}" ]]; then
     ulimit -S ${_ulimitOPT} ${_ulimitVAL} 2>/dev/null
-    [[ $? -ne 0 ]] && f_echo "Unable to set ulimit ${_ulimitOPT} to ${_ulimitVAL}: Value is $(ulimit ${_ulimitOPT})"
+    _ulimitSTS=$?
+
+    if [[ ${_ulimitSTS} -ne 0 ]]; then
+      f_echo "Unable to set preferred ulimit ${_ulimitOPT} ${_ulimitVAL}"
+    fi
+  else
+    _ulimitSTS=1
   fi
+
+  # If we did not set a preferred value, try to set a default
+
+  if [[ ${_ulimitSTS} -ne 0 ]]; then
+    ulimit -S ${_ulimitOPT} ${_ulimitDEF} 2>/dev/null
+    _ulimitSTS=$?
+
+    if [[ ${_ulimitSTS} -ne 0 ]]; then
+      f_echo "Unable to set default ulimit ${_ulimitOPT} ${_ulimitDEF}"
+      f_echo "Effective ulimit ${_ulimitOPT} $(ulimit ${_ulimitOPT})"
+    fi
+  fi
+
+  return ${_ulimitSTS}
 
 }
 
@@ -66,6 +86,8 @@ function f_addpath () {
     fi
   fi
 
+  return 0
+
 }
 
 
@@ -86,6 +108,8 @@ function f_addldlibrarypath () {
       fi
     fi
   fi
+
+  return 0
 
 }
 
@@ -282,4 +306,3 @@ function f_update_lock_timed () {
   return ${_updateStatus}
 
 }
-
