@@ -2,7 +2,7 @@
 
 # The CCTOOLS we are to use
 #cctoolsVer="current"
-cctoolsVer="4.2.0rc2"
+cctoolsVer="4.2.0"
 
 # Override the default it given
 [[ ! -z $1 ]] && cctoolsVer=$1

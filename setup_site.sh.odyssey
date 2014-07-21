@@ -44,7 +44,7 @@ export cvmfsProxy="${parrotProxy};DIRECT"
 # Since Odyssey is "native", use the local $OSG_APP and $OSG_GRID
 
 # Use a local $OSG_APP
-export OSG_APP=/n/atlasgrid/osg/app/atlas_app
+#export OSG_APP=/n/atlasgrid/osg/app/atlas_app
 
 # Use a local OSG WN Client
 export OSG_GRID=/n/atlasgrid/osg-wn-client

@@ -4,7 +4,7 @@
 
 
 # The version of the wrapper
-export parrotWrapperVersion="2.0-5"
+export parrotWrapperVersion="2.0-6"
 
 
 ######################################################################################
@@ -514,7 +514,7 @@ f_addpath "/sbin"
 
 # Fill in some defaults we would like to use
 
-[[ -z "${_ulimitOpenSize}  ]] && _ulimitOpenSize=65536
+[[ -z "${_ulimitOpenFiles} ]] && _ulimitOpenFiles=65536
 [[ -z "${_ulimitStackSize} ]] && _ulimitStackSize=unlimited
 
 
