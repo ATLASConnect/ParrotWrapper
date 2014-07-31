@@ -4,7 +4,7 @@
 
 
 # The version of the wrapper
-export parrotWrapperVersion="2.0-6"
+export parrotWrapperVersion="2.0-10"
 
 
 ######################################################################################
@@ -514,35 +514,37 @@ f_addpath "/sbin"
 
 # Fill in some defaults we would like to use
 
-[[ -z "${_ulimitOpenFiles} ]] && _ulimitOpenFiles=65536
-[[ -z "${_ulimitStackSize} ]] && _ulimitStackSize=unlimited
+[[ -z "${ulimitOpenFiles}"   ]] && ulimitOpenFiles=65536
+[[ -z "${ulimitStackSize}"   ]] && ulimitStackSize=unlimited
+[[ -z "${ulimitMaxUserProc}" ]] && ulimitMaxUserProc=unlimited
 
 
 # Set the various ulimits for the job using any values set in setup_site.sh
 
-f_ulimit -t unlimited ${ulimitCPU}
-f_ulimit -d unlimited ${ulimitDataSeg}
-f_ulimit -f unlimited ${ulimitFileSize}
-f_ulimit -n      4096 ${ulimitOpenFiles}
-f_ulimit -s     10240 ${ulimitStackSize}
-f_ulimit -m unlimited ${ulimitMaxMem}
-f_ulimit -v unlimited ${ulimitVirMem}
-f_ulimit -x unlimited ${ulimitFileLocks}
+f_ulimit -t  hard ${ulimitCPU}
+f_ulimit -d  hard ${ulimitDataSeg}
+f_ulimit -f  hard ${ulimitFileSize}
+f_ulimit -l  hard ${ulimitMaxLockMem}
+f_ulimit -n  hard ${ulimitOpenFiles}
+f_ulimit -s  hard ${ulimitStackSize}
+f_ulimit -m  hard ${ulimitMaxMem}
+f_ulimit -u  hard ${ulimitMaxUserProc}
+f_ulimit -v  hard ${ulimitVirMem}
+f_ulimit -x  hard ${ulimitFileLocks}
 
 #f_ulimit -n 4096      ${ulimitOpenFiles}
 #f_ulimit -c ''        ${ulimitCoreFileSize}
 #f_ulimit -e ''        ${ulimitSchedPrio}
 #f_ulimit -i ''        ${ulimitPendSig}
-#f_ulimit -l ''        ${ulimitMaxLockMem}
 #f_ulimit -p ''        ${ulimitPipeSize}
 #f_ulimit -q ''        ${ulimitPOSIXMesQ}
 #f_ulimit -r ''        ${ulimitRTPrio}
 
 f_echo
-f_echo "Executing command: ulimit -a"
+f_echo "Executing command: ulimit -S -a"
 f_echo
 
-ulimit -a
+ulimit -S -a
 
 f_echo
 

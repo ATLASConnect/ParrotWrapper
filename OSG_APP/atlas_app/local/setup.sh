@@ -13,6 +13,14 @@ export FRONTIER_LOG_LEVEL=warning
 #export FRONTIER_READTIMEOUTSECS=60
 
 
+# Tell the Pilot that we are not a local scratch disk
+export NON_LOCAL_ATLAS_SCRATCH=true
+
+# Scan for space utilization every 90 minutes (10 minute increments)
+export NON_LOCAL_ATLAS_SCRATCH_SPACE=9
+
+
+
 # dCache setup
 #export DCACHE_RAHEAD=TRUE
 #export DCACHE_RA_BUFFER=32768

@@ -51,15 +51,20 @@ function f_ulimit () {
     _ulimitSTS=1
   fi
 
+
   # If we did not set a preferred value, try to set a default
+  # If the default is "hard", use the Hard value
 
   if [[ ${_ulimitSTS} -ne 0 ]]; then
+
+    [[ "${_ulimitDEF}" = "hard" ]] && _ulimitDEF=$(ulimit -H ${_ulimitOPT})
+
     ulimit -S ${_ulimitOPT} ${_ulimitDEF} 2>/dev/null
     _ulimitSTS=$?
 
     if [[ ${_ulimitSTS} -ne 0 ]]; then
       f_echo "Unable to set default ulimit ${_ulimitOPT} ${_ulimitDEF}"
-      f_echo "Effective ulimit ${_ulimitOPT} $(ulimit ${_ulimitOPT})"
+      f_echo "Effective ulimit ${_ulimitOPT} $(ulimit -S ${_ulimitOPT})"
     fi
   fi
 
